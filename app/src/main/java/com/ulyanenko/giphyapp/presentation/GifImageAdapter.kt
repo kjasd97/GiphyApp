@@ -1,47 +1,68 @@
 package com.ulyanenko.giphyapp.presentation
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.ulyanenko.giphyapp.R
-import com.ulyanenko.giphyapp.data.model.DataObjectDto
-import com.ulyanenko.giphyapp.data.model.ResponseDto
 import com.ulyanenko.giphyapp.domain.GifImage
+import com.ulyanenko.giphyapp.presentation.util.GifDiffUtilCallback
 
-class GifImageAdapter(val context: Context) :
-    RecyclerView.Adapter<GifImageAdapter.GifImageViewHolder>() {
+class GifImageAdapter: ListAdapter<GifImage, GifImageAdapter.GifImageViewHolder>(GifDiffUtilCallback()) {
 
-    var gifs = listOf<GifImage>()
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
+    private lateinit var onReachEndListener: OnReachEndListener
+    private lateinit var onGifImageClickListener: OnGifImageClickListener
+    fun setOnReachEndListener(onReachEndListener: OnReachEndListener) {
+        this.onReachEndListener = onReachEndListener
+    }
+
+    fun setOnGifImageClickListener(onGifImageClickListener: OnGifImageClickListener) {
+        this.onGifImageClickListener = onGifImageClickListener
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): GifImageAdapter.GifImageViewHolder {
         return GifImageViewHolder(
-            LayoutInflater.from(context).inflate(R.layout.gif_item, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.gif_item, parent, false)
         )
     }
 
     override fun onBindViewHolder(holder: GifImageAdapter.GifImageViewHolder, position: Int) {
-        val data = gifs[position]
+        val gifImage = getItem(position)
 
-        Glide.with(context).load(data.url).into(holder.imageView)
+        Glide.with(holder.imageView.context).load(gifImage.url).into(holder.imageView)
+
+        if (position == currentList.size - 10 && onReachEndListener != null) {
+            onReachEndListener.onReachEnd()
+        }
+
+        holder.itemView.setOnClickListener {
+            if (onGifImageClickListener != null) {
+                onGifImageClickListener.onGigImageClick(gifImage)
+            }
+        }
 
     }
 
-    override fun getItemCount(): Int {
-        return gifs.size
-    }
+
 
     class GifImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView = itemView.findViewById<ImageView>(R.id.image)
+    }
+
+
+    interface OnReachEndListener {
+        fun onReachEnd()
+
+    }
+
+    interface OnGifImageClickListener {
+        fun onGigImageClick(gifImage: GifImage)
     }
 
 }

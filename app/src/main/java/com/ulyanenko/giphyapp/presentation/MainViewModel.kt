@@ -6,7 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.ulyanenko.giphyapp.data.mapper.GifImageMapper
 import com.ulyanenko.giphyapp.data.model.DataObjectDto
 import com.ulyanenko.giphyapp.data.network.ApiFactory
+import com.ulyanenko.giphyapp.data.repositoryImpl.GifImageRepositoryImpl
+import com.ulyanenko.giphyapp.domain.GetGifImagesBySearchUseCase
+import com.ulyanenko.giphyapp.domain.GetGifImagesUseCase
 import com.ulyanenko.giphyapp.domain.GifImage
+import com.ulyanenko.giphyapp.domain.GifImageRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,27 +18,57 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val repository:GifImageRepositoryImpl= GifImageRepositoryImpl(application)
+    private val getGifImages = GetGifImagesUseCase(repository)
+    private val getGifImagesBySearch = GetGifImagesBySearchUseCase(repository)
+
     private val _gifs: MutableStateFlow<List<GifImage>> = MutableStateFlow(listOf())
     val gifs: StateFlow<List<GifImage>> = _gifs.asStateFlow()
 
-    private val apiService = ApiFactory.apiService
+    private val _loading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
-    private val mapper = GifImageMapper()
+
     init {
         loadGifs()
     }
 
-    private fun loadGifs() {
+      fun loadGifs() {
+
+         val loading = _loading.value
+         if (loading) {
+             return
+         }
+         _loading.value = true
+
         viewModelScope.launch {
             try {
-                val listDto = apiService.loadImages().res.map {
-                    it.images.gifImage
-                }
-                val response = mapper.mapResponseToGifImage(listDto)
+                val response = getGifImages.getGifImages()
                 _gifs.value = response
+                _loading.value = false
             } catch (e: Exception) {
                 _gifs.value = emptyList()
             }
         }
+    }
+
+    fun loadGifsBySearch(search:String){
+
+        val loading = _loading.value
+        if (loading) {
+            return
+        }
+        _loading.value = true
+
+        viewModelScope.launch {
+            try {
+                val response =getGifImagesBySearch.getGifImagesBySearch(search)
+                _gifs.value = response
+                _loading.value = false
+            } catch (e: Exception) {
+                _gifs.value = emptyList()
+            }
+        }
+
     }
 }
