@@ -9,8 +9,9 @@ import com.ulyanenko.giphyapp.data.network.ApiFactory
 import com.ulyanenko.giphyapp.domain.GifImage
 import com.ulyanenko.giphyapp.domain.GifImageRepository
 import com.ulyanenko.giphyapp.data.database.AppDataBase
+import javax.inject.Inject
 
-class GifImageRepositoryImpl(application: Application) : GifImageRepository {
+class GifImageRepositoryImpl @Inject constructor (application: Application) : GifImageRepository {
 
     private val apiService = ApiFactory.apiService
     private val db = AppDataBase.getInstance(application)
@@ -45,10 +46,6 @@ class GifImageRepositoryImpl(application: Application) : GifImageRepository {
         return mapper.mapResponseToGifImage(listDto)
     }
 
-    override suspend fun addGifToDb(gifImage: GifImage) {
-        gifDAO.insertGifImage(mapper.mapFromGifImageToEntity(gifImage))
-    }
-
     override suspend fun getGifsFromDb(): List<GifImage> {
         val allGifs = gifDAO.getAllFavouriteGifs().toMutableList()
         val deletedGifs = deletedGifDAO.getAllDeletedGifs()
@@ -63,13 +60,6 @@ class GifImageRepositoryImpl(application: Application) : GifImageRepository {
         return allGifs
     }
 
-    override suspend fun getGifFromDb(url: String): GifImage? {
-        return gifDAO.getFavouriteGif(url)
-    }
-
-    override suspend fun deleteGifFromDb(url: String) {
-        gifDAO.removeMovie(url)
-    }
 
     override suspend fun deleteGif(gifImage: GifImage) {
         deletedGifDAO.deleteGifImage(mapper.mapFromGifImageToDeletedEntity(gifImage))

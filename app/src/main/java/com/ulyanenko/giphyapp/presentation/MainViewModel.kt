@@ -3,23 +3,26 @@ package com.ulyanenko.giphyapp.presentation
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ulyanenko.giphyapp.data.repositoryImpl.GifImageRepositoryImpl
 import com.ulyanenko.giphyapp.domain.DeleteGifUseCase
 import com.ulyanenko.giphyapp.domain.GetGifImagesBySearchUseCase
 import com.ulyanenko.giphyapp.domain.GetGifImagesUseCase
 import com.ulyanenko.giphyapp.domain.GifImage
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository: GifImageRepositoryImpl = GifImageRepositoryImpl(application)
-    private val getGifImages = GetGifImagesUseCase(repository)
-    private val getGifImagesBySearch = GetGifImagesBySearchUseCase(repository)
-    private val deleteGifImage = DeleteGifUseCase(repository)
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val getGifImages: GetGifImagesUseCase,
+    private val getGifImagesBySearch: GetGifImagesBySearchUseCase,
+    private val deleteGifImage: DeleteGifUseCase
+) : ViewModel() {
 
 
     private val _gifs: MutableStateFlow<List<GifImage>> = MutableStateFlow(listOf())
@@ -79,12 +82,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    fun deleteGifImage(deletedGifImage: GifImage){
+    fun deleteGifImage(deletedGifImage: GifImage) {
         viewModelScope.launch {
             deleteGifImage.deleteGif(deletedGifImage)
             val oldList = gifs.value.toMutableList()
             oldList.forEachIndexed { index, gifImage ->
-                if(gifImage.url==deletedGifImage.url){
+                if (gifImage.url == deletedGifImage.url) {
                     oldList[index] = deletedGifImage.copy(deleted = true)
                 }
             }

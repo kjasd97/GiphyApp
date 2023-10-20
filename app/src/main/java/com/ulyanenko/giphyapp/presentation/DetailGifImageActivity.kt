@@ -11,8 +11,10 @@ import com.bumptech.glide.Glide
 import com.ulyanenko.giphyapp.data.mapper.GifImageMapper
 import com.ulyanenko.giphyapp.databinding.ActivityDetailGifImageBinding
 import com.ulyanenko.giphyapp.domain.GifImage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class DetailGifImageActivity : AppCompatActivity() {
 
     private val binding by lazy {

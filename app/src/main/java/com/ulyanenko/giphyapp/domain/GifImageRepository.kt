@@ -10,13 +10,7 @@ interface GifImageRepository {
 
     suspend fun loadImagesBySearch(search: String):List<GifImage>
 
-    suspend fun addGifToDb(gifImage: GifImage)
-
     suspend fun getGifsFromDb():List<GifImage>
-
-    suspend fun getGifFromDb(url: String):GifImage?
-
-    suspend fun deleteGifFromDb(url:String)
 
     suspend fun deleteGif(gifImage: GifImage)
 

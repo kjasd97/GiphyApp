@@ -4,8 +4,9 @@ import com.ulyanenko.giphyapp.data.database.DeletedGifImageEntity
 import com.ulyanenko.giphyapp.data.database.GifImageEntity
 import com.ulyanenko.giphyapp.data.model.GifImageDto
 import com.ulyanenko.giphyapp.domain.GifImage
+import javax.inject.Inject
 
-class GifImageMapper {
+class GifImageMapper @Inject constructor() {
 
     fun mapResponseToGifImage(gifImagesDto: List<GifImageDto>): List<GifImage> {
 
