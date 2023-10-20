@@ -30,16 +30,19 @@ class MainActivity : AppCompatActivity() {
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
         gifsAdapter = GifImageAdapter()
 
-
+        binding.recycleView.itemAnimator = null
         binding.recycleView.adapter = gifsAdapter
         binding.recycleView.layoutManager = GridLayoutManager(this, 2)
 
+        gifsAdapter.deleteButtonClickListener = {
+            mainViewModel.deleteGifImage(it)
+        }
 
 
         lifecycleScope.launch {
             launch {
                 mainViewModel.gifs.collect {
-                    gifsAdapter.submitList(it)
+                    gifsAdapter.submitList(it.filterNot { it.deleted })
                 }
             }
 
@@ -56,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        gifsAdapter.setOnGifImageClickListener(object : GifImageAdapter.OnGifImageClickListener{
+        gifsAdapter.setOnGifImageClickListener(object : GifImageAdapter.OnGifImageClickListener {
             override fun onGigImageClick(gifImage: GifImage) {
                 val intent = DetailGifImageActivity.newIntent(this@MainActivity, gifImage)
                 startActivity(intent)

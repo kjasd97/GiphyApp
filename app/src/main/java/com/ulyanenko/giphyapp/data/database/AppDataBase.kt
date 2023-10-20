@@ -5,11 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [GifImageEntity::class], version = 1, exportSchema = false)
+@Database(entities = [GifImageEntity::class, DeletedGifImageEntity::class], version = 1, exportSchema = false)
 abstract class AppDataBase : RoomDatabase() {
 
 
     abstract fun methodsGifImageDao(): GifImageDAO
+    abstract fun deletedMethodsGifImageDao(): DeletedImagesDao
+
 
     companion object {
 

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ulyanenko.giphyapp.data.repositoryImpl.GifImageRepositoryImpl
+import com.ulyanenko.giphyapp.domain.DeleteGifUseCase
 import com.ulyanenko.giphyapp.domain.GetGifImagesBySearchUseCase
 import com.ulyanenko.giphyapp.domain.GetGifImagesUseCase
 import com.ulyanenko.giphyapp.domain.GifImage
@@ -18,6 +19,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: GifImageRepositoryImpl = GifImageRepositoryImpl(application)
     private val getGifImages = GetGifImagesUseCase(repository)
     private val getGifImagesBySearch = GetGifImagesBySearchUseCase(repository)
+    private val deleteGifImage = DeleteGifUseCase(repository)
+
 
     private val _gifs: MutableStateFlow<List<GifImage>> = MutableStateFlow(listOf())
     val gifs: StateFlow<List<GifImage>> = _gifs.asStateFlow()
@@ -74,5 +77,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
+    }
+
+    fun deleteGifImage(deletedGifImage: GifImage){
+        viewModelScope.launch {
+            deleteGifImage.deleteGif(deletedGifImage)
+            val oldList = gifs.value.toMutableList()
+            oldList.forEachIndexed { index, gifImage ->
+                if(gifImage.url==deletedGifImage.url){
+                    oldList[index] = deletedGifImage.copy(deleted = true)
+                }
+            }
+            _gifs.value = oldList
+        }
     }
 }

@@ -31,33 +31,6 @@ class DetailGifImageActivity : AppCompatActivity() {
 
         Glide.with(this).load(gifImage.url).into(binding.imageViewGif)
 
-        val starOff = ContextCompat.getDrawable(
-            this@DetailGifImageActivity,
-            android.R.drawable.star_big_off
-        )
-        val starOn = ContextCompat.getDrawable(
-            this@DetailGifImageActivity,
-            android.R.drawable.star_big_on
-        )
-        lifecycleScope.launch {
-
-            viewModel.getFavouriteGif(gifImage.url)
-
-
-            viewModel.gif.collect{
-                if (it == null) {
-                    binding.imageViewStar.setImageDrawable(starOff)
-                    binding.imageViewStar.setOnClickListener {
-                        viewModel.insertGif(gifImage)
-                    }
-                } else {
-                    binding.imageViewStar.setImageDrawable(starOn)
-                    binding.imageViewStar.setOnClickListener {
-                        viewModel.removeGif(gifImage.url)
-                    }
-                }
-            }
-        }
 
     }
 

@@ -13,7 +13,11 @@ import com.ulyanenko.giphyapp.data.database.AppDataBase
 class GifImageRepositoryImpl(application: Application) : GifImageRepository {
 
     private val apiService = ApiFactory.apiService
-    private val gifDAO = AppDataBase.getInstance(application).methodsGifImageDao()
+    private val db = AppDataBase.getInstance(application)
+    private val gifDAO = db.methodsGifImageDao()
+    private val deletedGifDAO = db.deletedMethodsGifImageDao()
+
+
 
     private val mapper = GifImageMapper()
 
@@ -30,7 +34,18 @@ class GifImageRepositoryImpl(application: Application) : GifImageRepository {
             Log.d("appError", "isNotEmpty")
             gifDAO.insertListGifImage(mapper.mapFromListGifImageToEntity(listDto))
         }
-        return gifDAO.getAllFavouriteGifs()
+
+        val allGifs = gifDAO.getAllFavouriteGifs().toMutableList()
+        val deletedGifs = deletedGifDAO.getAllDeletedGifs()
+
+        allGifs.forEachIndexed { index, gifImage ->
+            deletedGifs.forEach {
+             if (it.url==gifImage.url){
+                 allGifs[index] = it
+             }
+            }
+        }
+        return allGifs.toList()
     }
 
     override suspend fun loadImagesBySearch(search: String): List<GifImage> {
@@ -54,6 +69,10 @@ class GifImageRepositoryImpl(application: Application) : GifImageRepository {
 
     override suspend fun deleteGifFromDb(url: String) {
         gifDAO.removeMovie(url)
+    }
+
+    override suspend fun deleteGif(gifImage: GifImage) {
+        deletedGifDAO.deleteGifImage(mapper.mapFromGifImageToDeletedEntity(gifImage))
     }
 
 }

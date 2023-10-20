@@ -3,6 +3,7 @@ package com.ulyanenko.giphyapp.presentation
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -11,9 +12,11 @@ import com.ulyanenko.giphyapp.R
 import com.ulyanenko.giphyapp.domain.GifImage
 import com.ulyanenko.giphyapp.presentation.util.GifDiffUtilCallback
 
-class GifImageAdapter: ListAdapter<GifImage, GifImageAdapter.GifImageViewHolder>(GifDiffUtilCallback()) {
+class GifImageAdapter :
+    ListAdapter<GifImage, GifImageAdapter.GifImageViewHolder>(GifDiffUtilCallback()) {
 
     private lateinit var onGifImageClickListener: OnGifImageClickListener
+    var deleteButtonClickListener: ((GifImage) -> Unit)? = null
 
 
     fun setOnGifImageClickListener(onGifImageClickListener: OnGifImageClickListener) {
@@ -41,8 +44,14 @@ class GifImageAdapter: ListAdapter<GifImage, GifImageAdapter.GifImageViewHolder>
             }
         }
 
-    }
+        val deleteButton = holder.itemView.findViewById<ImageButton>(R.id.deleteButton)
 
+        deleteButton.setOnClickListener {
+            deleteButtonClickListener?.invoke(gifImage)
+        }
+
+
+    }
 
 
     class GifImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -53,5 +62,6 @@ class GifImageAdapter: ListAdapter<GifImage, GifImageAdapter.GifImageViewHolder>
     interface OnGifImageClickListener {
         fun onGigImageClick(gifImage: GifImage)
     }
+
 
 }

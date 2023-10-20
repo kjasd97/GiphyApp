@@ -18,4 +18,6 @@ interface GifImageRepository {
 
     suspend fun deleteGifFromDb(url:String)
 
+    suspend fun deleteGif(gifImage: GifImage)
+
 }
