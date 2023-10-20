@@ -31,7 +31,6 @@ class DetailGifImageActivity : AppCompatActivity() {
 
         val gifImage = intent.getSerializableExtra("gif") as GifImage
 
-        Glide.with(this).load(gifImage.url).into(binding.imageViewGif)
 
 
         lifecycleScope.launch {

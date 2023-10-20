@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".presentation.DetailGifImageActivity">
 
+
+
     <ImageView
         android:id="@+id/imageViewGif"
         android:layout_width="match_parent"
