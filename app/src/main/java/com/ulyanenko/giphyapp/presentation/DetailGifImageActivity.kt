@@ -5,36 +5,53 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.ulyanenko.giphyapp.R
+import com.ulyanenko.giphyapp.data.mapper.GifImageMapper
 import com.ulyanenko.giphyapp.databinding.ActivityDetailGifImageBinding
-import com.ulyanenko.giphyapp.databinding.ActivityMainBinding
 import com.ulyanenko.giphyapp.domain.GifImage
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class DetailGifImageActivity : AppCompatActivity() {
 
     private val binding by lazy {
         ActivityDetailGifImageBinding.inflate(layoutInflater)
     }
 
+    private lateinit var viewModel: DetailGifImageViewModel
+    private lateinit var gifAdapter: DetailGifImageAdapter
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        viewModel = ViewModelProvider(this)[DetailGifImageViewModel::class.java]
+
         val gifImage = intent.getSerializableExtra("gif") as GifImage
 
-        Glide.with(this).load(gifImage.url).into( binding.imageViewGif)
 
-        val starOff = ContextCompat.getDrawable(
-            this@DetailGifImageActivity,
-            android.R.drawable.star_big_off
-        )
-        val starOn = ContextCompat.getDrawable(
-            this@DetailGifImageActivity,
-            android.R.drawable.star_big_on
-        )
 
-        binding.imageViewStar.setImageDrawable(starOff)
+        lifecycleScope.launch {
+
+            viewModel.gif.collect{
+                gifAdapter = DetailGifImageAdapter()
+                binding.viewPager.adapter = gifAdapter
+                val filteredList = it.filterNot { it.deleted }
+                    gifAdapter.submitList(filteredList)
+
+
+
+                val itemToSet = filteredList.indexOf(gifImage)
+
+                binding.viewPager.setCurrentItem(itemToSet, false)
+
+            }
+        }
+
     }
 
     companion object {

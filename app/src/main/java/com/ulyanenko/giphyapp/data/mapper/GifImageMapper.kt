@@ -1,9 +1,12 @@
 package com.ulyanenko.giphyapp.data.mapper
 
+import com.ulyanenko.giphyapp.data.database.DeletedGifImageEntity
+import com.ulyanenko.giphyapp.data.database.GifImageEntity
 import com.ulyanenko.giphyapp.data.model.GifImageDto
 import com.ulyanenko.giphyapp.domain.GifImage
+import javax.inject.Inject
 
-class GifImageMapper {
+class GifImageMapper @Inject constructor() {
 
     fun mapResponseToGifImage(gifImagesDto: List<GifImageDto>): List<GifImage> {
 
@@ -18,4 +21,17 @@ class GifImageMapper {
         return result
     }
 
+    fun mapFromGifImageToEntity(gifImage: GifImage):GifImageEntity{
+        return GifImageEntity(url = gifImage.url, deleted = gifImage.deleted)
+    }
+
+    fun mapFromListGifImageToEntity(gifImages: List< GifImageDto>): List<GifImageEntity>{
+        return gifImages.map {
+            GifImageEntity(it.url, false)
+        }
+    }
+
+    fun mapFromGifImageToDeletedEntity(gifImage: GifImage):DeletedGifImageEntity{
+        return DeletedGifImageEntity(url = gifImage.url, true)
+    }
 }
