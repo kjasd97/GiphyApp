@@ -30,15 +30,15 @@ class GifImageRepositoryImpl(application: Application) : GifImageRepository {
         return mapper.mapResponseToGifImage(listDto)
     }
 
-    override suspend fun addGifToDb(gifImageEntity: GifImageEntity) {
-        gifDAO.insertGifImage(gifImageEntity)
+    override suspend fun addGifToDb(gifImage: GifImage) {
+        gifDAO.insertGifImage(mapper.mapFromGifImageToEntity(gifImage))
     }
 
     override suspend fun getGifsFromDb(): List<GifImage> {
         return gifDAO.getAllFavouriteGifs()
     }
 
-    override suspend fun getGifFromDb(url: String): GifImage {
+    override suspend fun getGifFromDb(url: String): GifImage? {
         return gifDAO.getFavouriteGif(url)
     }
 

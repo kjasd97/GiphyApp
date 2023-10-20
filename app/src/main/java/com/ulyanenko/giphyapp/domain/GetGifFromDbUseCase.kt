@@ -5,7 +5,7 @@ import com.ulyanenko.giphyapp.data.database.GifImageEntity
 
 class GetGifFromDbUseCase(private val gifImageRepository: GifImageRepository) {
 
-   suspend fun getGifFromDb (url: String): GifImage {
+   suspend fun getGifFromDb (url: String): GifImage? {
       return gifImageRepository.getGifFromDb(url)
    }
 

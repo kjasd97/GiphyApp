@@ -21,8 +21,6 @@ class DetailGifImageActivity : AppCompatActivity() {
 
     private lateinit var viewModel: DetailGifImageViewModel
 
-    private val mapper = GifImageMapper()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -42,11 +40,15 @@ class DetailGifImageActivity : AppCompatActivity() {
             android.R.drawable.star_big_on
         )
         lifecycleScope.launch {
+
+            viewModel.getFavouriteGif(gifImage.url)
+
+
             viewModel.gif.collect{
                 if (it == null) {
                     binding.imageViewStar.setImageDrawable(starOff)
                     binding.imageViewStar.setOnClickListener {
-                        viewModel.insertGif(mapper.mapFromGifImageToEntity(gifImage))
+                        viewModel.insertGif(gifImage)
                     }
                 } else {
                     binding.imageViewStar.setImageDrawable(starOn)

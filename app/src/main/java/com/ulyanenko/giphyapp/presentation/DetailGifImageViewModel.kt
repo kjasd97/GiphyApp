@@ -26,9 +26,8 @@ class DetailGifImageViewModel(application: Application) : AndroidViewModel(appli
     private val getGif = GetGifFromDbUseCase(repository)
 
 
-    private val _gif: MutableStateFlow<GifImage> = MutableStateFlow(GifImage(""))
-    val gif: StateFlow<GifImage> = _gif.asStateFlow()
-
+    private val _gif: MutableStateFlow<GifImage?> = MutableStateFlow(null)
+    val gif: StateFlow<GifImage?> = _gif.asStateFlow()
 
 
 //    suspend fun getFavouriteGifs() {
@@ -37,19 +36,21 @@ class DetailGifImageViewModel(application: Application) : AndroidViewModel(appli
 
 
 
-    suspend fun getFavouriteGif(url: String){
-        _gif.value= getGif.getGifFromDb(url)
+    suspend fun getFavouriteGif(url: String) {
+        _gif.value = getGif.getGifFromDb(url)
     }
 
-    fun insertGif(gif: GifImageEntity) {
+    fun insertGif(gif: GifImage) {
         viewModelScope.launch {
             addGif.addGifToDb(gif)
+            _gif.value = gif
         }
     }
 
     fun removeGif(url: String) {
         viewModelScope.launch {
             deleteGif.deleteGifFromDb(url)
+            _gif.value = null
         }
     }
 
