@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
 
         gifsAdapter.setOnGifImageClickListener(object : GifImageAdapter.OnGifImageClickListener {
-            override fun onGigImageClick(gifImage: GifImage) {
+            override fun onGifImageClick(gifImage: GifImage) {
                 val intent = DetailGifImageActivity.newIntent(this@MainActivity, gifImage)
                 startActivity(intent)
             }

@@ -12,8 +12,7 @@ import com.ulyanenko.giphyapp.R
 import com.ulyanenko.giphyapp.domain.GifImage
 import com.ulyanenko.giphyapp.presentation.util.GifDiffUtilCallback
 
-class GifImageAdapter :
-    ListAdapter<GifImage, GifImageAdapter.GifImageViewHolder>(GifDiffUtilCallback()) {
+class GifImageAdapter : ListAdapter<GifImage, GifImageAdapter.GifImageViewHolder>(GifDiffUtilCallback()) {
 
     private lateinit var onGifImageClickListener: OnGifImageClickListener
     var deleteButtonClickListener: ((GifImage) -> Unit)? = null
@@ -40,7 +39,7 @@ class GifImageAdapter :
 
         holder.itemView.setOnClickListener {
             if (onGifImageClickListener != null) {
-                onGifImageClickListener.onGigImageClick(gifImage)
+                onGifImageClickListener.onGifImageClick(gifImage)
             }
         }
 
@@ -60,7 +59,7 @@ class GifImageAdapter :
 
 
     interface OnGifImageClickListener {
-        fun onGigImageClick(gifImage: GifImage)
+        fun onGifImageClick(gifImage: GifImage)
     }
 
 

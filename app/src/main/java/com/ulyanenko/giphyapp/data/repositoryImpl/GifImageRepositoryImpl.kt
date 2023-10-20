@@ -35,17 +35,7 @@ class GifImageRepositoryImpl(application: Application) : GifImageRepository {
             gifDAO.insertListGifImage(mapper.mapFromListGifImageToEntity(listDto))
         }
 
-        val allGifs = gifDAO.getAllFavouriteGifs().toMutableList()
-        val deletedGifs = deletedGifDAO.getAllDeletedGifs()
-
-        allGifs.forEachIndexed { index, gifImage ->
-            deletedGifs.forEach {
-             if (it.url==gifImage.url){
-                 allGifs[index] = it
-             }
-            }
-        }
-        return allGifs.toList()
+        return getGifsFromDb()
     }
 
     override suspend fun loadImagesBySearch(search: String): List<GifImage> {
@@ -60,7 +50,17 @@ class GifImageRepositoryImpl(application: Application) : GifImageRepository {
     }
 
     override suspend fun getGifsFromDb(): List<GifImage> {
-        return gifDAO.getAllFavouriteGifs()
+        val allGifs = gifDAO.getAllFavouriteGifs().toMutableList()
+        val deletedGifs = deletedGifDAO.getAllDeletedGifs()
+
+        allGifs.forEachIndexed { index, gifImage ->
+            deletedGifs.forEach {
+                if (it.url==gifImage.url){
+                    allGifs[index] = it
+                }
+            }
+        }
+        return allGifs
     }
 
     override suspend fun getGifFromDb(url: String): GifImage? {

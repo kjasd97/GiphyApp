@@ -20,6 +20,8 @@ class DetailGifImageActivity : AppCompatActivity() {
     }
 
     private lateinit var viewModel: DetailGifImageViewModel
+    private lateinit var gifAdapter: DetailGifImageAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +33,23 @@ class DetailGifImageActivity : AppCompatActivity() {
 
         Glide.with(this).load(gifImage.url).into(binding.imageViewGif)
 
+
+        lifecycleScope.launch {
+
+            viewModel.gif.collect{
+                gifAdapter = DetailGifImageAdapter()
+                binding.viewPager.adapter = gifAdapter
+                val filteredList = it.filterNot { it.deleted }
+                    gifAdapter.submitList(filteredList)
+
+
+
+                val itemToSet = filteredList.indexOf(gifImage)
+
+                binding.viewPager.setCurrentItem(itemToSet, false)
+
+            }
+        }
 
     }
 

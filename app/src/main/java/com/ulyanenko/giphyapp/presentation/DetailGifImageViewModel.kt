@@ -21,37 +21,18 @@ class DetailGifImageViewModel(application: Application) : AndroidViewModel(appli
     private val repository: GifImageRepositoryImpl = GifImageRepositoryImpl(application)
 
     private val getGifs = GetGifImagesFromDbUseCase(repository)
-    private val addGif = AddGifImagesToDbUseCase(repository)
-    private val deleteGif = DeleteGifImagesFromDbUseCase(repository)
-    private val getGif = GetGifFromDbUseCase(repository)
 
 
-    private val _gif: MutableStateFlow<GifImage?> = MutableStateFlow(null)
-    val gif: StateFlow<GifImage?> = _gif.asStateFlow()
+    private val _gif: MutableStateFlow<List<GifImage>> = MutableStateFlow(listOf())
+    val gif: StateFlow<List<GifImage>> = _gif.asStateFlow()
 
-
-//    suspend fun getFavouriteGifs() {
-//        _gif.value = getGifs.getGifFromDb()
-//    }
-
-
-
-    suspend fun getFavouriteGif(url: String) {
-        _gif.value = getGif.getGifFromDb(url)
-    }
-
-    fun insertGif(gif: GifImage) {
+    init {
         viewModelScope.launch {
-            addGif.addGifToDb(gif)
-            _gif.value = gif
+            val listGifs = getGifs.getGifFromDb()
+            _gif.value = listGifs
         }
+
     }
 
-    fun removeGif(url: String) {
-        viewModelScope.launch {
-            deleteGif.deleteGifFromDb(url)
-            _gif.value = null
-        }
-    }
 
 }
