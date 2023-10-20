@@ -1,6 +1,7 @@
 package com.ulyanenko.giphyapp.data.repositoryImpl
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.ulyanenko.giphyapp.data.database.GifImageEntity
 import com.ulyanenko.giphyapp.data.mapper.GifImageMapper
@@ -17,10 +18,19 @@ class GifImageRepositoryImpl(application: Application) : GifImageRepository {
     private val mapper = GifImageMapper()
 
     override suspend fun loadImages(): List<GifImage> {
-        val listDto = apiService.loadImages().res.map {
-            it.images.gifImage
+        val listDto = try {
+            apiService.loadImages().res.map {
+                it.images.gifImage
+            }
+        }catch (e: Exception){
+            Log.d("appError", e.message.toString())
+            listOf()
         }
-        return mapper.mapResponseToGifImage(listDto)
+        if (listDto.isNotEmpty()){
+            Log.d("appError", "isNotEmpty")
+            gifDAO.insertListGifImage(mapper.mapFromListGifImageToEntity(listDto))
+        }
+        return gifDAO.getAllFavouriteGifs()
     }
 
     override suspend fun loadImagesBySearch(search: String): List<GifImage> {

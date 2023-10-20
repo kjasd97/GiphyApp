@@ -23,4 +23,9 @@ class GifImageMapper {
         return GifImageEntity(url = gifImage.url)
     }
 
+    fun mapFromListGifImageToEntity(gifImages: List< GifImageDto>): List<GifImageEntity>{
+        return gifImages.map {
+            GifImageEntity(it.url)
+        }
+    }
 }

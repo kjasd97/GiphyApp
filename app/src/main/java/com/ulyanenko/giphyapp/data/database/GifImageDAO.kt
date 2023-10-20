@@ -21,4 +21,7 @@ interface GifImageDAO {
 
     @Query("SELECT * FROM favourite_gifs where url = :url")
     suspend fun getFavouriteGif(url: String): GifImage?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertListGifImage(gifs: List<GifImageEntity>)
 }

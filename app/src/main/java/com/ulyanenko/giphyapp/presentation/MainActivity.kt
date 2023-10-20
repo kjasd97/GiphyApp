@@ -55,13 +55,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        lifecycleScope.launch {
-            gifsAdapter.setOnReachEndListener(object : GifImageAdapter.OnReachEndListener {
-                override fun onReachEnd() {
-                    mainViewModel.loadGifs()
-                }
-            })
-        }
 
         gifsAdapter.setOnGifImageClickListener(object : GifImageAdapter.OnGifImageClickListener{
             override fun onGigImageClick(gifImage: GifImage) {

@@ -1,16 +1,13 @@
 package com.ulyanenko.giphyapp.presentation
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.ulyanenko.giphyapp.data.mapper.GifImageMapper
-import com.ulyanenko.giphyapp.data.model.DataObjectDto
-import com.ulyanenko.giphyapp.data.network.ApiFactory
 import com.ulyanenko.giphyapp.data.repositoryImpl.GifImageRepositoryImpl
 import com.ulyanenko.giphyapp.domain.GetGifImagesBySearchUseCase
 import com.ulyanenko.giphyapp.domain.GetGifImagesUseCase
 import com.ulyanenko.giphyapp.domain.GifImage
-import com.ulyanenko.giphyapp.domain.GifImageRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository:GifImageRepositoryImpl= GifImageRepositoryImpl(application)
+    private val repository: GifImageRepositoryImpl = GifImageRepositoryImpl(application)
     private val getGifImages = GetGifImagesUseCase(repository)
     private val getGifImagesBySearch = GetGifImagesBySearchUseCase(repository)
 
@@ -30,16 +27,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 
     init {
-        loadGifs()
+        viewModelScope.launch {
+            try {
+                loadGifs()
+            } catch (e: Exception) {
+                Log.d("loadCategoriesFromDataBase", e.message.toString())
+            }
+        }
     }
 
-      fun loadGifs() {
 
-         val loading = _loading.value
-         if (loading) {
-             return
-         }
-         _loading.value = true
+    private fun loadGifs() {
+
+        val loading = _loading.value
+        if (loading) {
+            return
+        }
+        _loading.value = true
 
         viewModelScope.launch {
             try {
@@ -52,7 +56,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun loadGifsBySearch(search:String){
+    fun loadGifsBySearch(search: String) {
 
         val loading = _loading.value
         if (loading) {
@@ -62,7 +66,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
-                val response =getGifImagesBySearch.getGifImagesBySearch(search)
+                val response = getGifImagesBySearch.getGifImagesBySearch(search)
                 _gifs.value = response
                 _loading.value = false
             } catch (e: Exception) {

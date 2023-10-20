@@ -13,11 +13,8 @@ import com.ulyanenko.giphyapp.presentation.util.GifDiffUtilCallback
 
 class GifImageAdapter: ListAdapter<GifImage, GifImageAdapter.GifImageViewHolder>(GifDiffUtilCallback()) {
 
-    private lateinit var onReachEndListener: OnReachEndListener
     private lateinit var onGifImageClickListener: OnGifImageClickListener
-    fun setOnReachEndListener(onReachEndListener: OnReachEndListener) {
-        this.onReachEndListener = onReachEndListener
-    }
+
 
     fun setOnGifImageClickListener(onGifImageClickListener: OnGifImageClickListener) {
         this.onGifImageClickListener = onGifImageClickListener
@@ -37,9 +34,6 @@ class GifImageAdapter: ListAdapter<GifImage, GifImageAdapter.GifImageViewHolder>
 
         Glide.with(holder.imageView.context).load(gifImage.url).into(holder.imageView)
 
-        if (position == currentList.size - 10 && onReachEndListener != null) {
-            onReachEndListener.onReachEnd()
-        }
 
         holder.itemView.setOnClickListener {
             if (onGifImageClickListener != null) {
@@ -55,11 +49,6 @@ class GifImageAdapter: ListAdapter<GifImage, GifImageAdapter.GifImageViewHolder>
         val imageView = itemView.findViewById<ImageView>(R.id.image)
     }
 
-
-    interface OnReachEndListener {
-        fun onReachEnd()
-
-    }
 
     interface OnGifImageClickListener {
         fun onGigImageClick(gifImage: GifImage)
