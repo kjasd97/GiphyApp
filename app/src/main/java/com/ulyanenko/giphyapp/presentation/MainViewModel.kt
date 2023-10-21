@@ -33,17 +33,15 @@ class MainViewModel @Inject constructor(
 
 
     init {
-        viewModelScope.launch {
-            try {
-                loadGifs()
-            } catch (e: Exception) {
-                Log.d("loadCategoriesFromDataBase", e.message.toString())
-            }
+        try {
+            loadGifs()
+        } catch (e: Exception) {
+            Log.d("loadCategoriesFromDataBase", e.message.toString())
         }
     }
 
 
-    private fun loadGifs() {
+    fun loadGifs() {
 
         val loading = _loading.value
         if (loading) {
@@ -62,7 +60,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun loadGifsBySearch(search: String) {
+    fun loadGifsBySearch(search: String?) {
+
+        if (search == null) return
 
         val loading = _loading.value
         if (loading) {

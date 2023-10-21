@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var gifsAdapter: GifImageAdapter
-
+    private var searchRequest: String? = null
 
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -61,15 +61,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
-        gifsAdapter.setOnGifImageClickListener(object : GifImageAdapter.OnGifImageClickListener {
-            override fun onGifImageClick(gifImage: GifImage) {
-                val intent = DetailGifImageActivity.newIntent(this@MainActivity, gifImage)
-                startActivity(intent)
-            }
-
-        })
-
         binding.search.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
@@ -78,12 +69,27 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(p0: Editable?) {
-                val search = p0.toString()
-                if (search.isNotBlank()) {
-                    mainViewModel.loadGifsBySearch(search)
+                searchRequest = p0.toString()
+                if (!searchRequest.isNullOrBlank()) {
+                    mainViewModel.loadGifsBySearch(searchRequest)
+                } else {
+                    mainViewModel.loadGifs()
                 }
             }
 
+        })
+
+        gifsAdapter.setOnGifImageClickListener(object : GifImageAdapter.OnGifImageClickListener {
+            override fun onGifImageClick(gifImage: GifImage) {
+                val search = searchRequest ?: ""
+
+                val intent = if (search.isNotBlank()) {
+                    DetailGifImageActivity.newIntent(this@MainActivity, gifImage, search)
+                } else {
+                    DetailGifImageActivity.newIntent(this@MainActivity, gifImage)
+                }
+                startActivity(intent)
+            }
         })
 
 
