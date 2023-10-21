@@ -43,7 +43,17 @@ class GifImageRepositoryImpl @Inject constructor (application: Application) : Gi
         val listDto = apiService.searchImages(search).res.map {
             it.images.gifImage
         }
-        return mapper.mapResponseToGifImage(listDto)
+        val allGifs = mapper.mapResponseToGifImage(listDto).toMutableList()
+        val deletedGifs = deletedGifDAO.getAllDeletedGifs()
+
+        allGifs.forEachIndexed { index, gifImage ->
+            deletedGifs.forEach {
+                if (it.url==gifImage.url){
+                    allGifs[index] = it
+                }
+            }
+        }
+        return allGifs
     }
 
     override suspend fun getGifsFromDb(): List<GifImage> {
