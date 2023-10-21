@@ -9,15 +9,16 @@ import com.ulyanenko.giphyapp.data.network.ApiFactory
 import com.ulyanenko.giphyapp.domain.GifImage
 import com.ulyanenko.giphyapp.domain.GifImageRepository
 import com.ulyanenko.giphyapp.data.database.AppDataBase
+import com.ulyanenko.giphyapp.data.network.ApiService
 import javax.inject.Inject
 
-class GifImageRepositoryImpl @Inject constructor (application: Application) : GifImageRepository {
+class GifImageRepositoryImpl @Inject constructor(
+    private val apiService: ApiService,
+    db: AppDataBase
+) : GifImageRepository {
 
-    private val apiService = ApiFactory.apiService
-    private val db = AppDataBase.getInstance(application)
     private val gifDAO = db.methodsGifImageDao()
     private val deletedGifDAO = db.deletedMethodsGifImageDao()
-
 
 
     private val mapper = GifImageMapper()
@@ -27,11 +28,11 @@ class GifImageRepositoryImpl @Inject constructor (application: Application) : Gi
             apiService.loadImages().res.map {
                 it.images.gifImage
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Log.d("appError", e.message.toString())
             listOf()
         }
-        if (listDto.isNotEmpty()){
+        if (listDto.isNotEmpty()) {
             Log.d("appError", "isNotEmpty")
             gifDAO.insertListGifImage(mapper.mapFromListGifImageToEntity(listDto))
         }
@@ -44,35 +45,29 @@ class GifImageRepositoryImpl @Inject constructor (application: Application) : Gi
             it.images.gifImage
         }
         val allGifs = mapper.mapResponseToGifImage(listDto).toMutableList()
-        val deletedGifs = deletedGifDAO.getAllDeletedGifs()
-
-        allGifs.forEachIndexed { index, gifImage ->
-            deletedGifs.forEach {
-                if (it.url==gifImage.url){
-                    allGifs[index] = it
-                }
-            }
-        }
-        return allGifs
+        return addDeletedGifsToList(allGifs)
     }
+
 
     override suspend fun getGifsFromDb(): List<GifImage> {
         val allGifs = gifDAO.getAllFavouriteGifs().toMutableList()
-        val deletedGifs = deletedGifDAO.getAllDeletedGifs()
-
-        allGifs.forEachIndexed { index, gifImage ->
-            deletedGifs.forEach {
-                if (it.url==gifImage.url){
-                    allGifs[index] = it
-                }
-            }
-        }
-        return allGifs
+        return addDeletedGifsToList(allGifs)
     }
-
 
     override suspend fun deleteGif(gifImage: GifImage) {
         deletedGifDAO.deleteGifImage(mapper.mapFromGifImageToDeletedEntity(gifImage))
     }
 
+    private suspend fun addDeletedGifsToList(allGifs: MutableList<GifImage>): List<GifImage> {
+        val deletedGifs = deletedGifDAO.getAllDeletedGifs()
+
+        allGifs.forEachIndexed { index, gifImage ->
+            deletedGifs.forEach {
+                if (it.url == gifImage.url) {
+                    allGifs[index] = it
+                }
+            }
+        }
+        return allGifs
+    }
 }
